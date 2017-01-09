@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head lang="en">
+        <title>ChatApp</title>
+        <meta charset="UTF-8" />
+        <link href="../../static/css/bootstrap.css" th:href="@{/static/css/bootstrap.css}" rel="stylesheet" type="text/css" />
+        <link href="../../static/css/style.css" th:href="@{/static/css/style.css}" rel="stylesheet" type="text/css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    </head>
+    <body>
+        <div th:replace="fragments/header :: header"></div>
+
+        <div class="container-fluid">
+            <p th:text="${welcomeMessage}"></p>
+
+            <h2>Your chatrooms:</h2>
+            <div th:each="chatroom : ${chatrooms}">
+                <ul>
+                    <li>
+                        <a th:text="${chatroom.title}" th:href="@{|/chatrooms/${chatroom.id}|}"></a>
+                    </li>
+                </ul>
+            </div>
+
+            <h2>Create a chatroom</h2>
+            <form th:action="@{/chatrooms}" method="POST">
+                <p>Chatroom name:</p>
+                <input type="text" name="title" placeholder="chatroom title"/> 
+                <input type="text" name="description" placeholder="chatroom description"/>
+                <input type="submit" name="Start chatting!"/>            
+            </form>
+
+            <div style="visibility: hidden">
+                <h2>Your friends:</h2>
+                <div th:each="friend : ${friends}">
+                    <ul>
+                        <li>
+                            <p th:text="${friend.username}"></p>
+                        </li>
+                    </ul>
+
+                </div>
+                <h2>Add a friend</h2>
+                <p th:text="${friendingMessage}"></p>
+                <form th:action="@{/friend}" method="POST">
+                    <input type="text" name="username" placeholder="enter username"/> 
+                    <input type="submit" name="Start chatting!"/>            
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
