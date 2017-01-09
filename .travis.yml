@@ -1,1 +1,16 @@
 language: java
+
+jdk:
+  - oraclejdk8
+
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+
+deploy:
+  api_key:
+    secure: IJZfXVOlqrHKaLn/GF/7X7sWJvD8Yoai6Cm0+iIIwCX2z/ax9N8CBVZIywxZL0eMiO2G36bXVfIozF69zKPy6o9iBSiRIxeuov4AXSQfAx/ILy9ICdsJxgz7LNd+SdRY/Ubqbhb0d/HNYAZEchtnO8rFd/TEYTtVBfyw5zodfBia7A8pA27UDoE/2qUFeBfvzruBP09zwxdeY1qlowZ88z6UoSkr8re4lJ8kUV0IUfNwDF14xeP6tU20JP+OUA/d3fR4JGajK1tvV1uigtLeJ8I5t9DhoG/iRUcRalLxaZE3MiIql+glimX/iVkLZduAgwkazvqS0fGtlcvbzOPg9uNDYoM4eJ9zqLwpu0s7q6lW7PwuDIPEuicSP8coxyA2qebhtAlm2lgcGnsQE6BBhLOtLUoPNVmGSh1EoZIo5A6B0TCCcasSzU+uzxFTC7oT4FdZ3IxUiTLV9Bgp1shoNAfK1D+UOppIWb5/gldMhgXiLf78/tpNNHmfgvPQV6bDneQe/nf69xFG+hCpfOILahKGp7+bj8pBl5KTrHEz30+O6Qx8cXNYZXl1qRSg9xO+M9OYrSMegOxeNI46rMaHMmuUQL1/FcDRvpNHPjLdiyFBYkMi0X87xRYwMCco2YPm4Ljp/gBLLiImhofpNy9sieI2iai34s29iQz32F/84I8=
+  app: just-a-web-chat
+  on:
+    repo: TaikaMurmeli/JustAWebChat
