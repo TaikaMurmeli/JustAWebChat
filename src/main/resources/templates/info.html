@@ -10,22 +10,23 @@
     <body>
         <div th:replace="fragments/header :: header"></div>
 
-        <h2>Welcome to the info page of this chatroom app!</h2>
+        <div class="container-fluid">
+            <h2>Welcome to the info page of this chatroom app!</h2>
 
-        <h3>About:</h3>
+            <h3>About:</h3>
 
-        <p>This is a chatroom application created in order to get a job.<br/>
-            The main culprit: <a href="https://www.reaktor.com/careers/summer/">https://www.reaktor.com/careers/summer/</a>
-        </p>
+            <p>This is a chatroom application created in order to get a job.<br/>
+                The main culprit: <a href="https://www.reaktor.com/careers/summer/">https://www.reaktor.com/careers/summer/</a>
+            </p>
 
-        <h3>Info on usage of this app:</h3>
-        <p>A user of this app is required to log in with an account which 
-            can be created <a th:href="@{/signup}">here.</a></p>
-        <p>A user can create his own chatrooms and invite other users
-            to a chatroom the user belongs to, provided he knows their usernames.</p>
-        <p>Chatrooms can be left via the "leave" button, however a chatroom will be 
-            destroyed if the are no users left in the chatroom</p>
-        <p>Users may also be added as friends in order to remember your friends' usernames and easily add them to chatrooms (upcoming feature).</p>
-
+            <h3>Info on usage of this app:</h3>
+            <p>A user of this app is required to log in with an account which 
+                can be created <a th:href="@{/signup}">here.</a></p>
+            <p>A user can create his own chatrooms and invite other users
+                to a chatroom the user belongs to, provided he knows their usernames.</p>
+            <p>Chatrooms can be left via the "leave" button, however a chatroom will be 
+                destroyed if the are no users left in the chatroom</p>
+            <p>Users may also be added as friends in order to remember your friends' usernames and easily add them to chatrooms (upcoming feature).</p>
+        </div>
     </body>
 </html>
