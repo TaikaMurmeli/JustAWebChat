@@ -22,7 +22,7 @@ public class DevProfile {
 
     @PostConstruct
     public void init() {
-        //Test profiles
+        //Profiles for testing the app by hand
         
         User juan = new User();
         juan.setName("Juan");

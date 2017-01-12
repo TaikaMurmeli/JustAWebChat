@@ -1,6 +1,5 @@
 package wad.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.junit.After;
@@ -12,10 +11,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,6 +26,7 @@ import wad.repository.UserRepository;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import wad.domain.Message;
+import static wad.testUtil.TestObjectBuilder.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = WebChat.class)
@@ -55,39 +52,23 @@ public class MessageControllerTest {
     @Before
     public void setUp() {
 
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .build();
 
-        bob = new User();
-        bob.setName("Bob");
-        bob.setUsername("bob");
-        bob.setPassword("password");
-        bob.setFriends(new ArrayList());
-        bob.setChatrooms(new ArrayList());
-        bob.setMessages(new ArrayList());
+        bob = userRepository.save(createUser("bob"));
 
-        bob = userRepository.save(bob);
-
-        chatroom = new Chatroom();
-        chatroom.setTitle("chatroom number one");
-        chatroom.setDescription("this is an example chatroom");
-        chatroom.setUsers(new ArrayList());
-        chatroom.setMessages(new ArrayList());
+        chatroom = createChatroom();
         chatroom.addUser(bob);
-
         chatroom = chatroomRepository.save(chatroom);
+
         bob.addChatroom(chatroom);
-
         bob = userRepository.save(bob);
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication user = manager.authenticate(new UsernamePasswordAuthenticationToken("bob", "password"));
-        context.setAuthentication(user);
-
-        SecurityContextHolder.setContext(context);
     }
 
     @Test
     @Transactional
+    @WithMockUser("bob")
     public void testChat() throws Exception {
 
         List<Message> messages = chatroom.getMessages();
@@ -111,12 +92,10 @@ public class MessageControllerTest {
     @Transactional
     public void tearDown() {
 
-        chatroom.getMessages().clear();
-        chatroom.getUsers().clear();
+        clearChatroomData(chatroom);
         chatroomRepository.delete(chatroom);
 
-        bob.getMessages().clear();
-        bob.getChatrooms().clear();
+        clearUserData(bob);
         userRepository.delete(bob);
     }
 }

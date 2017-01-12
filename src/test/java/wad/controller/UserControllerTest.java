@@ -1,6 +1,5 @@
 package wad.controller;
 
-import java.util.ArrayList;
 import javax.transaction.Transactional;
 import org.junit.After;
 import org.junit.Before;
@@ -19,14 +18,12 @@ import wad.domain.User;
 import wad.repository.UserRepository;
 import wad.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import wad.WebChat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import org.springframework.security.test.context.support.WithMockUser;
+import static wad.testUtil.TestObjectBuilder.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = WebChat.class)
@@ -45,36 +42,14 @@ public class UserControllerTest {
 
     private MockMvc mockMvc;
     private User bob;
-    private User greg;
 
     @Before
     public void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
-        bob = new User();
-        bob.setName("Bob");
-        bob.setUsername("bob");
-        bob.setPassword("IzzAccept4ble");
-        bob.setFriends(new ArrayList());
-        bob.setChatrooms(new ArrayList());
-
-        bob = userRepository.save(bob);
-
-        greg = new User();
-        greg.setName("Greg");
-        greg.setUsername("greg");
-        greg.setPassword("IzzAccept4ble");
-        greg.setFriends(new ArrayList());
-        greg.setChatrooms(new ArrayList());
-
-        greg = userRepository.save(greg);
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication user = manager.authenticate(new UsernamePasswordAuthenticationToken("bob", "IzzAccept4ble"));
-        context.setAuthentication(user);
-
-        SecurityContextHolder.setContext(context);
-    }
+        this.mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .build();
+        bob = userRepository.save(createUser("bob"));
+   }
 
     @Test
     public void testSignUp() throws Exception {
@@ -88,7 +63,8 @@ public class UserControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
                 .andExpect(flash().attributeExists("signupMessage"))
-                .andExpect(flash().attribute("signupMessage", "Account succesfully created!"));
+                .andExpect(flash().attribute("signupMessage",
+                        "Account succesfully created!"));
         User user = userRepository.findByUsername(username);
 
         assertEquals(name, user.getName());
@@ -109,12 +85,12 @@ public class UserControllerTest {
                 .param("password", password))
                 .andExpect(status().is2xxSuccessful());
 //                .andExpect(forwardedUrl("signup"));
-                
+
         User user = userRepository.findByUsername(username);
 
         assertEquals(user, null);
     }
-    
+
     @Test
     public void signUpFailsWithBadPassword() throws Exception {
         String username = "anders";
@@ -127,21 +103,23 @@ public class UserControllerTest {
                 .param("password", passwordNotComplexEnough))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attribute("passwordErrorMessage", "Invalid password!"));
-        
+                .andExpect(flash().attribute("passwordErrorMessage", 
+                        "Invalid password!"));
+
         mockMvc.perform(post("/signup")
                 .param("name", name)
                 .param("username", username)
                 .param("password", passwordTooShort))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attribute("passwordErrorMessage", "Invalid password!"));
-                        
+                .andExpect(flash().attribute("passwordErrorMessage", 
+                        "Invalid password!"));
+
         User user = userRepository.findByUsername(username);
 
         assertEquals(user, null);
     }
-    
+
     @Test
     public void signUpFailsWithDuplicateUsername() throws Exception {
         String username = "bob";
@@ -154,33 +132,43 @@ public class UserControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
                 .andExpect(flash().attributeExists("signupMessage"))
-                .andExpect(flash().attribute("signupMessage", "Username already in use!"));
+                .andExpect(flash().attribute("signupMessage", 
+                        "Username already in use!"));
 
         User user = userRepository.findByUsername(username);
 
-        assertEquals(user.getName(), "Bob");
+        assertEquals(user, bob);
     }
 
     @Test
     @Transactional
+    @WithMockUser("bob")
     public void testAddFriend() throws Exception {
+        
+        User greg = userRepository.save(createUser("greg"));
 
         assertTrue(bob.getFriends().isEmpty());
 
         mockMvc.perform((post("/friend")).param("username", greg.getUsername()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index"))
-                .andExpect(flash().attribute("friendingMessage", greg.getUsername() + " is now your friend!"));
+                .andExpect(flash().attribute("friendingMessage", greg.getUsername() + 
+                        " is now your friend!"));
 
         assertEquals(bob.getFriends().size(), 1);
         assertEquals(bob.getFriends().get(0), greg);
 
         //Adding friends is one-sided.
         assertTrue(greg.getFriends().isEmpty());
+
+        clearUserData(greg);
+        userRepository.delete(greg);
+
     }
 
     @Test
     @Transactional
+    @WithMockUser("bob")
     public void cannotAddSelfAsFriend() throws Exception {
 
         assertTrue(bob.getFriends().isEmpty());
@@ -188,13 +176,15 @@ public class UserControllerTest {
         mockMvc.perform((post("/friend")).param("username", bob.getUsername()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index"))
-                .andExpect(flash().attribute("friendingMessage", "You cannot add yourself as friend. Makes no sense..."));
+                .andExpect(flash().attribute("friendingMessage", 
+                        "You cannot add yourself as friend. Makes no sense..."));
 
         assertTrue(bob.getFriends().isEmpty());
     }
 
     @Test
     @Transactional
+    @WithMockUser("bob")
     public void testAddingNonExistentUserAsFriend() throws Exception {
 
         assertTrue(bob.getFriends().isEmpty());
@@ -202,7 +192,8 @@ public class UserControllerTest {
         mockMvc.perform((post("/friend")).param("username", "notAUserName"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index"))
-                .andExpect(flash().attribute("friendingMessage", "Given username doesn not exist."));
+                .andExpect(flash().attribute("friendingMessage", 
+                        "Given username doesn not exist."));
 
         assertTrue(bob.getFriends().isEmpty());
     }
@@ -210,9 +201,7 @@ public class UserControllerTest {
     @After
     @Transactional
     public void tearDown() {
-        bob.getFriends().remove(greg);
-        greg.getFriends().remove(bob);
+        clearUserData(bob);
         userRepository.delete(bob);
-        userRepository.delete(greg);
     }
 }
