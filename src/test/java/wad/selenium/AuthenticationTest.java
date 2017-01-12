@@ -1,4 +1,4 @@
-package selenium;
+package wad.selenium;
 
 import org.fluentlenium.adapter.FluentTest;
 import org.junit.Test;

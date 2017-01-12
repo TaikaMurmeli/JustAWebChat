@@ -1,5 +1,5 @@
 
-package selenium;
+package wad.selenium;
 
 // importit
 
