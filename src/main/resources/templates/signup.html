@@ -22,7 +22,7 @@
                 <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
 
                 <p>Password:</p>
-                <input type="password" name="password" placeholder="password" id="passwordInput"/>
+                <input type="password" th:field="*{password}" placeholder="password"/>
                 <p th:text="${passwordErrorMessage}"></p>
                 <pre>The password must be at least 8 characters long 
 and must contain upper and lower case letters

@@ -1,11 +1,13 @@
 
-package wad.testUtil;
+package testUtil;
 
 import java.util.ArrayList;
 import wad.domain.Chatroom;
 import wad.domain.User;
 
 public class TestObjectBuilder {
+    
+    public static final String plainTextPassword = "IzzAccept4ble";
     
     public static Chatroom createChatroom() {
         Chatroom chatroom = new Chatroom();
@@ -24,9 +26,9 @@ public class TestObjectBuilder {
     
     public static User createUser(String username) {
         User user = new User();
-        user.setName("asd");
+        user.setName("maybeShouldGetRidOfThisField");
         user.setUsername(username);
-        user.setPassword("IzzAccept4ble");
+        user.setPassword(plainTextPassword);
         user.setFriends(new ArrayList());
         user.setChatrooms(new ArrayList());
         user.setMessages(new ArrayList());

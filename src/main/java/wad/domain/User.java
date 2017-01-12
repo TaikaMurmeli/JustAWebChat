@@ -15,10 +15,6 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
-/**
- *
- * @author sjsarsa
- */
 @Entity
 public class User extends AbstractPersistable<Long>{
     @Valid

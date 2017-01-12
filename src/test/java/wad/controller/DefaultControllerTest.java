@@ -20,7 +20,10 @@ import wad.WebChat;
 import wad.domain.User;
 import wad.repository.UserRepository;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static wad.testUtil.TestObjectBuilder.*;
+import static testUtil.TestObjectBuilder.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = WebChat.class)
