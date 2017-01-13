@@ -28,6 +28,7 @@ public class TestObjectBuilder {
         User user = new User();
         user.setName("maybeShouldGetRidOfThisField");
         user.setUsername(username);
+        user.setEmail("example@example.com");
         user.setPassword(plainTextPassword);
         user.setFriends(new ArrayList());
         user.setChatrooms(new ArrayList());

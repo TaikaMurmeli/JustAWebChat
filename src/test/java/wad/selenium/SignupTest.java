@@ -29,6 +29,7 @@ public class SignupTest extends FluentTest {
     private WebDriver webDriver = new HtmlUnitDriver();
     private final String username = "jack";
     private final String password = "Izg00dBazzwurd";
+    private final String email = "email@domain.com";
 
     private String getUrl() {
         return "http://localhost:" + serverPort;
@@ -48,6 +49,7 @@ public class SignupTest extends FluentTest {
 
         fill(find("#name")).with("Jack");
         fill(find("#username")).with(username);
+        fill(find("#email")).with(email);
         fill(find("#password")).with(password);
         submit(find("form").first());
 

@@ -1,4 +1,3 @@
-
 package wad.domain;
 
 import java.util.Date;
@@ -10,36 +9,42 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 @Entity
-public class User extends AbstractPersistable<Long>{
+public class User extends AbstractPersistable<Long> {
+
     @Valid
     //The unicode characters are Ä,ä,Ö,ö
-    @NotBlank(message="You must enter a name.")
-    @Pattern(regexp = "^[a-zA-Z_\\s\\u00c4\\u00e4\\u00d6\\u00f6]+$", 
+    @NotBlank(message = "You must enter a name.")
+    @Pattern(regexp = "^[a-zA-Z_\\s\\u00c4\\u00e4\\u00d6\\u00f6]+$",
             message = "Name can only contain characters and spaces.")
     private String name;
-    
-    @Length(min=3, max=15, message = "Username length must be between 3 and 15")
-    @Column(unique=true)
-    @Pattern(regexp = "^[a-zA-Z0-9_\\s\\u00c4\\u00e4\\u00d6\\u00f6]+$", 
+
+    @Length(min = 3, max = 15, message = "Username length must be between 3 and 15")
+    @Column(unique = true)
+    @Pattern(regexp = "^[a-zA-Z0-9_\\s\\u00c4\\u00e4\\u00d6\\u00f6]+$",
             message = "Username can only contain characters, numbers, spaces and underlines.")
     private String username;
-    
+
+    @NotBlank
+    @Email
+    private String email;
+
     @NotBlank
     //Password validation done in controller because of hashing with salt
     private String password;
     private String salt;
-    
+
     @ManyToMany
     private List<User> friends;
     @ManyToMany
     private List<Chatroom> chatrooms;
-    @OneToMany(mappedBy="author")
+    @OneToMany(mappedBy = "author")
     private List<Message> messages;
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date lastOnline;
@@ -51,11 +56,11 @@ public class User extends AbstractPersistable<Long>{
     public void setFriends(List<User> friends) {
         this.friends = friends;
     }
-    
+
     public void addFriend(User user) {
         this.friends.add(user);
     }
-    
+
     public List<Chatroom> getChatrooms() {
         return chatrooms;
     }
@@ -112,9 +117,17 @@ public class User extends AbstractPersistable<Long>{
     public void setUsername(String username) {
         this.username = username;
     }
-    
+
     public void addChatroom(Chatroom chatroom) {
         this.chatrooms.add(chatroom);
     }
-    
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 }

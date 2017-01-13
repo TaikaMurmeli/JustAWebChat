@@ -19,17 +19,8 @@ import wad.repository.UserRepository;
 import wad.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import wad.WebChat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import org.springframework.security.test.context.support.WithMockUser;
 import static testUtil.TestObjectBuilder.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
@@ -58,26 +49,29 @@ public class UserControllerTest {
                 .webAppContextSetup(webApplicationContext)
                 .build();
         bob = userRepository.save(createUser("bob"));
-   }
+    }
 
     @Test
     public void testSignUp() throws Exception {
         String username = "darthVedur31";
         String name = "Bob";
         String password = "EbinPa55Wurd";
+        String email = "bob@email.com";
         mockMvc.perform(post("/signup")
                 .param("name", name)
                 .param("username", username)
-                .param("password", password))
+                .param("password", password)
+                .param("email", email))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attributeExists("signupMessage"))
                 .andExpect(flash().attribute("signupMessage",
                         "Account succesfully created!"));
         User user = userRepository.findByUsername(username);
 
         assertEquals(name, user.getName());
         assertEquals(username, user.getUsername());
+        assertEquals(email, user.getEmail());
+        //test for not saving plain text password
         assertNotEquals(password, user.getPassword());
 
         userRepository.delete(user);
@@ -85,15 +79,16 @@ public class UserControllerTest {
 
     @Test
     public void signUpFailsWithValidationErrors() throws Exception {
-        String username = "123!!";
-        String name = "...";
-        String password = "wurd";
+        String username = "...";
+
         mockMvc.perform(post("/signup")
-                .param("name", name)
+                .param("name", "123!!")
                 .param("username", username)
-                .param("password", password))
-                .andExpect(status().is2xxSuccessful());
-//                .andExpect(forwardedUrl("signup"));
+                .param("password", "")
+                .param("email", ""))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attributeHasFieldErrors(
+                        "user", "name", "username", "email"));
 
         User user = userRepository.findByUsername(username);
 
@@ -104,24 +99,28 @@ public class UserControllerTest {
     public void signUpFailsWithBadPassword() throws Exception {
         String username = "anders";
         String name = "Anders";
+        String email = "email@email.com";
         String passwordNotComplexEnough = "passwurd";
         String passwordTooShort = "short";
+
         mockMvc.perform(post("/signup")
                 .param("name", name)
                 .param("username", username)
-                .param("password", passwordNotComplexEnough))
+                .param("password", passwordNotComplexEnough)
+                .param("email", email))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attribute("passwordErrorMessage", 
+                .andExpect(flash().attribute("passwordErrorMessage",
                         "Invalid password!"));
 
         mockMvc.perform(post("/signup")
                 .param("name", name)
                 .param("username", username)
-                .param("password", passwordTooShort))
+                .param("password", passwordTooShort)
+                .param("email", email))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attribute("passwordErrorMessage", 
+                .andExpect(flash().attribute("passwordErrorMessage",
                         "Invalid password!"));
 
         User user = userRepository.findByUsername(username);
@@ -134,14 +133,16 @@ public class UserControllerTest {
         String username = "bob";
         String name = "Blerb";
         String password = "EbinPa55Wurd";
+        String email = "email@email.com";
         mockMvc.perform(post("/signup")
                 .param("name", name)
                 .param("username", username)
-                .param("password", password))
+                .param("password", password)
+                .param("email", email))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
                 .andExpect(flash().attributeExists("signupMessage"))
-                .andExpect(flash().attribute("signupMessage", 
+                .andExpect(flash().attribute("signupMessage",
                         "Username already in use!"));
 
         User user = userRepository.findByUsername(username);
@@ -153,7 +154,7 @@ public class UserControllerTest {
     @Transactional
     @WithMockUser("bob")
     public void testAddFriend() throws Exception {
-        
+
         User greg = userRepository.save(createUser("greg"));
 
         assertTrue(bob.getFriends().isEmpty());
@@ -161,8 +162,8 @@ public class UserControllerTest {
         mockMvc.perform((post("/friend")).param("username", greg.getUsername()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index"))
-                .andExpect(flash().attribute("friendingMessage", greg.getUsername() + 
-                        " is now your friend!"));
+                .andExpect(flash().attribute("friendingMessage", greg.getUsername()
+                        + " is now your friend!"));
 
         assertEquals(bob.getFriends().size(), 1);
         assertEquals(bob.getFriends().get(0), greg);
@@ -185,7 +186,7 @@ public class UserControllerTest {
         mockMvc.perform((post("/friend")).param("username", bob.getUsername()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index"))
-                .andExpect(flash().attribute("friendingMessage", 
+                .andExpect(flash().attribute("friendingMessage",
                         "You cannot add yourself as friend. Makes no sense..."));
 
         assertTrue(bob.getFriends().isEmpty());
@@ -201,7 +202,7 @@ public class UserControllerTest {
         mockMvc.perform((post("/friend")).param("username", "notAUserName"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/index"))
-                .andExpect(flash().attribute("friendingMessage", 
+                .andExpect(flash().attribute("friendingMessage",
                         "Given username doesn not exist."));
 
         assertTrue(bob.getFriends().isEmpty());

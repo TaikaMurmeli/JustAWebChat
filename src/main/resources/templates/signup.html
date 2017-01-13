@@ -20,7 +20,11 @@
                 <p>Username:</p>
                 <input type="text" th:field="*{username}" placeholder="username"/>
                 <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
-
+                
+                <p>Email:</p>
+                <input type="text" th:field="*{email}" placeholder="email@domain.com"/>
+                <p th:if="${#fields.hasErrors('username')}" th:errors="*{email}"></p>
+                
                 <p>Password:</p>
                 <input type="password" th:field="*{password}" placeholder="password"/>
                 <p th:text="${passwordErrorMessage}"></p>

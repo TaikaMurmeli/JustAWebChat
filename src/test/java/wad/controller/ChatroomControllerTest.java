@@ -2,8 +2,6 @@ package wad.controller;
 
 import javax.transaction.Transactional;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,10 +26,6 @@ import wad.repository.UserRepository;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static testUtil.TestObjectBuilder.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -181,7 +175,7 @@ public class ChatroomControllerTest {
         chatroom2 = chatroomRepository.save(chatroom2);
         bob.addChatroom(chatroom2);
         greg.addChatroom(chatroom2);
-        
+
         assertTrue(bob.getChatrooms().contains(chatroom2));
         mockMvc.perform(post("/chatrooms/leave/" + chatroom2.getId()))
                 .andExpect(status().is3xxRedirection())
@@ -189,14 +183,14 @@ public class ChatroomControllerTest {
 
         assertTrue(!bob.getChatrooms().contains(chatroom2));
         assertTrue(greg.getChatrooms().contains(chatroom2));
-        
+
         clearUserData(greg);
         userRepository.delete(greg);
-        
+
         clearChatroomData(chatroom2);
         chatroomRepository.delete(chatroom2);
     }
-    
+
     @Test
     @Transactional
     public void leavingChatroomAsLastPersonDestroysTheChatroom() throws Exception {
@@ -204,7 +198,7 @@ public class ChatroomControllerTest {
         chatroom2.addUser(bob);
         chatroom2 = chatroomRepository.save(chatroom2);
         bob.addChatroom(chatroom2);
-        
+
         assertTrue(chatroom2.getUsers().contains(bob));
         assertEquals(chatroom2.getUsers().size(), 1);
         mockMvc.perform(post("/chatrooms/leave/" + chatroom2.getId()))
