@@ -54,25 +54,22 @@ public class UserControllerTest {
     @Test
     public void testSignUp() throws Exception {
         String username = "darthVedur31";
-        String name = "Bob";
-        String password = "EbinPa55Wurd";
-        String email = "bob@email.com";
+
         mockMvc.perform(post("/signup")
-                .param("name", name)
+                .param("name", "Bob")
                 .param("username", username)
-                .param("password", password)
-                .param("email", email))
+                .param("password", VALID_PLAIN_TEXT_PASSWORD)
+                .param("email", VALID_EMAIL))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attribute("signupMessage",
+                .andExpect(flash().attribute("successfulSignupMessage",
                         "Account succesfully created!"));
         User user = userRepository.findByUsername(username);
 
-        assertEquals(name, user.getName());
+        assertEquals("Bob", user.getName());
         assertEquals(username, user.getUsername());
-        assertEquals(email, user.getEmail());
         //test for not saving plain text password
-        assertNotEquals(password, user.getPassword());
+        assertNotEquals(VALID_PLAIN_TEXT_PASSWORD, user.getPassword());
 
         userRepository.delete(user);
     }
@@ -99,7 +96,6 @@ public class UserControllerTest {
     public void signUpFailsWithBadPassword() throws Exception {
         String username = "anders";
         String name = "Anders";
-        String email = "email@email.com";
         String passwordNotComplexEnough = "passwurd";
         String passwordTooShort = "short";
 
@@ -107,21 +103,19 @@ public class UserControllerTest {
                 .param("name", name)
                 .param("username", username)
                 .param("password", passwordNotComplexEnough)
-                .param("email", email))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attribute("passwordErrorMessage",
-                        "Invalid password!"));
+                .param("email", VALID_EMAIL))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attribute("passwordErrorMessage",
+                        "not a valid password"));
 
         mockMvc.perform(post("/signup")
                 .param("name", name)
                 .param("username", username)
                 .param("password", passwordTooShort)
-                .param("email", email))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attribute("passwordErrorMessage",
-                        "Invalid password!"));
+                .param("email", VALID_EMAIL))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attribute("passwordErrorMessage",
+                        "not a valid password"));
 
         User user = userRepository.findByUsername(username);
 
@@ -130,23 +124,16 @@ public class UserControllerTest {
 
     @Test
     public void signUpFailsWithDuplicateUsername() throws Exception {
-        String username = "bob";
-        String name = "Blerb";
-        String password = "EbinPa55Wurd";
-        String email = "email@email.com";
         mockMvc.perform(post("/signup")
-                .param("name", name)
-                .param("username", username)
-                .param("password", password)
-                .param("email", email))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/signup"))
-                .andExpect(flash().attributeExists("signupMessage"))
-                .andExpect(flash().attribute("signupMessage",
-                        "Username already in use!"));
+                .param("name", "Blerb")
+                .param("username", bob.getUsername())
+                .param("password", VALID_PLAIN_TEXT_PASSWORD)
+                .param("email", VALID_EMAIL))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attribute("usernameUsedErrorMessage",
+                        "username already in use"));
 
-        User user = userRepository.findByUsername(username);
-
+        User user = userRepository.findByUsername(bob.getUsername());
         assertEquals(user, bob);
     }
 

@@ -20,15 +20,16 @@ public class User extends AbstractPersistable<Long> {
 
     @Valid
     //The unicode characters are Ä,ä,Ö,ö
-    @NotBlank(message = "You must enter a name.")
+    @NotBlank
     @Pattern(regexp = "^[a-zA-Z_\\s\\u00c4\\u00e4\\u00d6\\u00f6]+$",
-            message = "Name can only contain characters and spaces.")
+            message = "can only contain characters and spaces.")
     private String name;
-
-    @Length(min = 3, max = 15, message = "Username length must be between 3 and 15")
+    
+    @NotBlank
+    @Length(min = 3, max = 15, message = "length must be between 3 and 15")
     @Column(unique = true)
     @Pattern(regexp = "^[a-zA-Z0-9_\\s\\u00c4\\u00e4\\u00d6\\u00f6]+$",
-            message = "Username can only contain characters, numbers, spaces and underlines.")
+            message = "can only contain characters, numbers, spaces and underlines.")
     private String username;
 
     @NotBlank

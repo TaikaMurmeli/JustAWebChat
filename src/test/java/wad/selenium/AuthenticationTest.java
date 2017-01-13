@@ -11,15 +11,12 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import wad.WebChat;
-import static org.junit.Assert.assertEquals;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.context.WebApplicationContext;
 import static testUtil.TestObjectBuilder.createUser;
 import wad.repository.UserRepository;
-import static org.junit.Assert.assertEquals;
-import static testUtil.TestObjectBuilder.plainTextPassword;
-import static org.junit.Assert.assertEquals;
+import static testUtil.TestObjectBuilder.VALID_PLAIN_TEXT_PASSWORD;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -70,7 +67,7 @@ public class AuthenticationTest extends FluentTest {
         goTo(getUrl());
 
         fill(find("#username")).with("user");
-        fill(find("#password")).with(plainTextPassword);
+        fill(find("#password")).with(VALID_PLAIN_TEXT_PASSWORD);
         submit(find("form").first());
 
         goTo(getUrl());

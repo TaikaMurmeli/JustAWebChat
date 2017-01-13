@@ -30,26 +30,32 @@ public class UserController {
             BindingResult bindingResult,
             HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
-        
-        String password = request.getParameter("password");
 
-        if (bindingResult.hasErrors()) {    
+        String password = request.getParameter("password");
+        String username = request.getParameter("username");
+
+        boolean errors = false;
+
+        if (userRepository.findByUsername(username) != null) {
+            model.addAttribute("usernameUsedErrorMessage",
+                    "username already in use");
+            errors = true;
+        }
+
+        if (!passwordIsValid(password)) {
+            model.addAttribute("passwordErrorMessage", "not a valid password");
+            errors = true;
+        }
+        if (bindingResult.hasErrors()) {
+            errors = true;
+        }
+
+        if (errors) {
             return "signup";
         }
-       
-        if (userRepository.findByUsername(user.getUsername()) != null) {
-            redirectAttributes.addFlashAttribute("signupMessage",
-                    "Username already in use!");
-            return "redirect:/signup";
-        }
-        
-        if (!passwordIsValid(password)) {
-             redirectAttributes.addFlashAttribute("passwordErrorMessage", "Invalid password!");
-             return "redirect:/signup";
-        }
-        
+
         userRepository.save(user);
-        redirectAttributes.addFlashAttribute("signupMessage",
+        redirectAttributes.addFlashAttribute("successfulSignupMessage",
                 "Account succesfully created!");
         return "redirect:/signup";
     }
@@ -73,9 +79,9 @@ public class UserController {
     }
 
     private boolean passwordIsValid(String password) {
-        
+
         if (password.length() < 8) {
-             return false;
+            return false;
         }
         String regex = "^(?=.*[a-z\u00e4\u00f6])(?=.*[A-Z\u00c4\u00d6])(?=.*[-0-9_!%.,+*?$€@^]).+$";
         if (!password.matches(regex)) {
@@ -83,6 +89,5 @@ public class UserController {
         }
         return true;
     }
-    
-    
+
 }

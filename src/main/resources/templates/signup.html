@@ -11,7 +11,7 @@
     <body>
         <div class="container-fluid">
             <h2>Sign up</h2>
-            <h3 th:text="${signupMessage}"/>
+            <h3 th:text="${successfulSignupMessage}"/>
             <form action="#" th:action="@{/signup}" th:object="${user}" method="POST">
                 <p>Name:</p>
                 <input type="text" th:field="*{name}" placeholder="your name"/>
@@ -20,6 +20,7 @@
                 <p>Username:</p>
                 <input type="text" th:field="*{username}" placeholder="username"/>
                 <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+                <p th:text="${usernameUsedErrorMessage}"></p>
                 
                 <p>Email:</p>
                 <input type="text" th:field="*{email}" placeholder="email@domain.com"/>
