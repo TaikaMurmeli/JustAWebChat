@@ -54,7 +54,6 @@ public class ChatroomControllerTest {
 
     private MockMvc mockMvc;
     private Chatroom chatroom;
-    private Chatroom chatroom2;
     private User bob;
 
     @Before
@@ -99,7 +98,7 @@ public class ChatroomControllerTest {
     @Test
     @Transactional
     public void viewingChatroomWithoutPermissionDoesNotShowData() throws Exception {
-        chatroom2 = chatroomRepository.save(createChatroom());
+        Chatroom chatroom2 = chatroomRepository.save(createChatroom());
 
         mockMvc.perform(get("/chatrooms/" + chatroom2.getId()))
                 .andExpect(status().is2xxSuccessful())
@@ -170,6 +169,49 @@ public class ChatroomControllerTest {
 
         assertTrue(chatroom.getUsers().contains(bob));
         assertEquals(chatroom.getUsers().size(), 1);
+    }
+
+    @Test
+    @Transactional
+    public void testLeavingChatroom() throws Exception {
+        User greg = userRepository.save(createUser("greg"));
+        Chatroom chatroom2 = createChatroom();
+        chatroom2.addUser(bob);
+        chatroom2.addUser(greg);
+        chatroom2 = chatroomRepository.save(chatroom2);
+        bob.addChatroom(chatroom2);
+        greg.addChatroom(chatroom2);
+        
+        assertTrue(bob.getChatrooms().contains(chatroom2));
+        mockMvc.perform(post("/chatrooms/leave/" + chatroom2.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+
+        assertTrue(!bob.getChatrooms().contains(chatroom2));
+        assertTrue(greg.getChatrooms().contains(chatroom2));
+        
+        clearUserData(greg);
+        userRepository.delete(greg);
+        
+        clearChatroomData(chatroom2);
+        chatroomRepository.delete(chatroom2);
+    }
+    
+    @Test
+    @Transactional
+    public void leavingChatroomAsLastPersonDestroysTheChatroom() throws Exception {
+        Chatroom chatroom2 = createChatroom();
+        chatroom2.addUser(bob);
+        chatroom2 = chatroomRepository.save(chatroom2);
+        bob.addChatroom(chatroom2);
+        
+        assertTrue(chatroom2.getUsers().contains(bob));
+        assertEquals(chatroom2.getUsers().size(), 1);
+        mockMvc.perform(post("/chatrooms/leave/" + chatroom2.getId()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+
+        assertTrue(!chatroomRepository.exists(chatroom2.getId()));
     }
 
     @After
