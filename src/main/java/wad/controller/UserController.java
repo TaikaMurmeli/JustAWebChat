@@ -1,12 +1,14 @@
 package wad.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,25 +63,42 @@ public class UserController {
     }
 
     @RequestMapping(value = "/friend", method = RequestMethod.POST)
-    public String addFriend(@RequestParam String username, RedirectAttributes redirectAttributes) {
+    public String addFriend(@RequestParam String username, 
+            RedirectAttributes redirectAttributes) {
         User self = userService.getAuthenticatedUser();
         User friend = userRepository.findByUsername(username);
 
         if (friend == null) {
-            redirectAttributes.addFlashAttribute("friendingMessage", "Given username doesn not exist.");
+            redirectAttributes.addFlashAttribute("friendingMessage", 
+                    "Given username doesn not exist.");
         } else if (friend.equals(self)) {
-            redirectAttributes.addFlashAttribute("friendingMessage", "You cannot add yourself as friend. Makes no sense...");
+            redirectAttributes.addFlashAttribute("friendingMessage", 
+                    "You cannot add yourself as friend. Makes no sense...");
         } else {
             self.addFriend(friend);
             userRepository.save(self);
-            redirectAttributes.addFlashAttribute("friendingMessage", username + " is now your friend!");
+            redirectAttributes.addFlashAttribute("friendingMessage", 
+                    username + " is now your friend!");
         }
 
-        return "redirect:/index";
+        return "redirect:/";
+    }
+    
+    @Transactional
+    @RequestMapping(value="/remove-friend/{username}", method=RequestMethod.POST)
+    public String removeFriend(@PathVariable String username,
+            RedirectAttributes redirectAttributes) {
+            //Might make some checker for having the friend...
+            User self = userService.getAuthenticatedUser();
+            User friend = userRepository.findByUsername(username);
+            self.getFriends().remove(friend);
+            redirectAttributes.addFlashAttribute("friendingMessage", 
+                    username + " is no longer your friend.");
+        
+        return "redirect:/";
     }
 
     private boolean passwordIsValid(String password) {
-
         if (password.length() < 8) {
             return false;
         }

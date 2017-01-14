@@ -27,7 +27,7 @@ public class DevProfile {
         User juan = new User();
         juan.setName("Juan");
         juan.setUsername("juan");
-        juan.setPassword("JuanLikesDogs");
+        juan.setPassword("JuanLikesD0gs");
         juan.setEmail("juan@email.com");
         juan.setFriends(new ArrayList());
         juan.setChatrooms(new ArrayList());

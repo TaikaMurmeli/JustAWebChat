@@ -67,10 +67,12 @@ public class SignupTest extends FluentTest {
 
         assertTrue(pageSource()
                 .contains("You are currently logged in as " + username + "."));
+        
+        userRepository.delete(userRepository.findByUsername(username));
     }
 
     @Test
-    public void testBadFormInput() {
+    public void testBadFormInputAllBad() {
         goTo(getUrl() + "/signup");
 
         fill(find("#name")).with("...");
@@ -85,7 +87,55 @@ public class SignupTest extends FluentTest {
         assertTrue(pageSource().contains("not a well-formed email address"));
         assertTrue(pageSource().contains("not a valid password"));
     }
+    
+    @Test
+    public void testBadFormInputEmptyName() {
+        goTo(getUrl() + "/signup");
 
+        fill(find("#name")).with();
+        fill(find("#username")).with("user123");
+        fill(find("#email")).with(VALID_EMAIL);
+        fill(find("#password")).with(VALID_PLAIN_TEXT_PASSWORD);
+        submit(find("form").first());
+
+        assertTrue(pageSource().contains("may not be empty"));
+    }
+    
+    public void testBadFormInputEmptyUserName() {
+        goTo(getUrl() + "/signup");
+
+        fill(find("#name")).with("Bob");
+        fill(find("#username")).with("");
+        fill(find("#email")).with(VALID_EMAIL);
+        fill(find("#password")).with(VALID_PLAIN_TEXT_PASSWORD);
+        submit(find("form").first());
+
+        assertTrue(pageSource().contains("may not be empty"));
+    }
+
+    public void testBadFormInputEmptyEmail() {
+        goTo(getUrl() + "/signup");
+
+        fill(find("#name")).with("Bob");
+        fill(find("#username")).with("user123");
+        fill(find("#email")).with();
+        fill(find("#password")).with(VALID_PLAIN_TEXT_PASSWORD);
+        submit(find("form").first());
+
+        assertTrue(pageSource().contains("may not be empty"));
+    }
+    
+    public void testBadFormInputEmptyPassword() {
+        goTo(getUrl() + "/signup");
+
+        fill(find("#name")).with();
+        fill(find("#username")).with("user123");
+        fill(find("#email")).with(VALID_EMAIL);
+        fill(find("#password")).with();
+        submit(find("form").first());
+
+        assertTrue(pageSource().contains("may not be empty"));
+    }
     @Test
     public void noDuplicateUsernames() {
         User bob = userRepository.save(createUser("bob"));
@@ -99,6 +149,9 @@ public class SignupTest extends FluentTest {
 
         assertTrue(!pageSource().contains("Account succesfully created!"));
         assertTrue(pageSource().contains("username already in use"));
+        
+        clearUserData(bob);
+        userRepository.delete(bob);
     }
 
 }

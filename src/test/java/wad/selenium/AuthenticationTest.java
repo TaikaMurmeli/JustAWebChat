@@ -14,10 +14,10 @@ import wad.WebChat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.context.WebApplicationContext;
-import static testUtil.TestObjectBuilder.createUser;
 import wad.repository.UserRepository;
-import static testUtil.TestObjectBuilder.VALID_PLAIN_TEXT_PASSWORD;
+import static testUtil.TestObjectBuilder.*;
 import static org.junit.Assert.assertEquals;
+import wad.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = WebChat.class)
@@ -62,7 +62,7 @@ public class AuthenticationTest extends FluentTest {
     @Test
     @WithMockUser
     public void authenticatedUserRedirectsToIndexWithImproperUrlPath() {
-        userRepository.save(createUser("user"));
+        User user = userRepository.save(createUser("user"));
 
         goTo(getUrl());
 
@@ -78,5 +78,8 @@ public class AuthenticationTest extends FluentTest {
 
         goTo(getUrl() + "/info");
         assertEquals("Info", title());
+        
+        clearUserData(user);
+        userRepository.delete(user);
     }
 }

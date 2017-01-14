@@ -148,7 +148,7 @@ public class UserControllerTest {
 
         mockMvc.perform((post("/friend")).param("username", greg.getUsername()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/index"))
+                .andExpect(redirectedUrl("/"))
                 .andExpect(flash().attribute("friendingMessage", greg.getUsername()
                         + " is now your friend!"));
 
@@ -172,7 +172,7 @@ public class UserControllerTest {
 
         mockMvc.perform((post("/friend")).param("username", bob.getUsername()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/index"))
+                .andExpect(redirectedUrl("/"))
                 .andExpect(flash().attribute("friendingMessage",
                         "You cannot add yourself as friend. Makes no sense..."));
 
@@ -188,13 +188,32 @@ public class UserControllerTest {
 
         mockMvc.perform((post("/friend")).param("username", "notAUserName"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/index"))
+                .andExpect(redirectedUrl("/"))
                 .andExpect(flash().attribute("friendingMessage",
                         "Given username doesn not exist."));
 
         assertTrue(bob.getFriends().isEmpty());
     }
-
+    
+    @Test
+    @Transactional
+    @WithMockUser("bob")
+    public void testRemovingFriend() throws Exception {
+        User greg = userRepository.save(createUser("greg"));
+        bob.addFriend(greg);
+        
+        mockMvc.perform((post("/remove-friend/" + greg.getUsername())))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+                .andExpect(flash().attribute("friendingMessage",
+                        "greg is no longer your friend."));
+        
+        assertTrue(!bob.getFriends().contains(greg));
+        
+        clearUserData(greg);
+        userRepository.delete(greg);
+    }
+    
     @After
     @Transactional
     public void tearDown() {

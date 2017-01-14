@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head lang="en">
-        <title>ChatApp</title>
+        <title >JustAWebChat</title>
         <meta charset="UTF-8" />
         <link href="../../static/css/bootstrap.css" th:href="@{/static/css/bootstrap.css}" rel="stylesheet" type="text/css" />
         <link href="../../static/css/style.css" th:href="@{/static/css/style.css}" rel="stylesheet" type="text/css" />
+        <script src="../../static/js/jquery.min.js"></script>
+        <script src="../../static/js/bootstrap.min.js"></script>
+        <script src="../../static/js/chatroom.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
     </head>
     <body>
@@ -14,7 +17,7 @@
             <p th:text="${unauthorizedAccess}"></p>
             <div th:if="${chatroom != null}">
                 <h2 th:text="${chatroom.title}"></h2>
-                <h4>Decription:</h4>
+                <h4>Description:</h4>
                 <p th:text="${chatroom.description}"></p>
 
                 <h3>Messages:</h3>
@@ -29,11 +32,11 @@
                 </div>
                 <form th:action="@{|/message/${chatroom.id}|}" method="POST">
                     <input type="text" name="content"/>
-                    <input type="submit"/>
+                    <input type="submit" value="send"/>
                 </form>
 
                 <h4>Chatroom members:</h4>
-                <div th:each="user : ${chatroom.users}">
+                <div th:each="user : ${chatroom.users}" id="chatroom-members">
                     <ul>
                         <li>
                             <p th:text="${user.username}"></p>
@@ -42,10 +45,25 @@
                 </div>
 
                 <h4>Add a new member to this chatroom</h4>
-                <form th:action="@{|/chatrooms/addUser/${chatroom.id}|}" method ="POST">
-                    <input type="text" name="username"/>
-                    <input type="submit"/>
+                <form th:action="@{|/chatrooms/addUser/${chatroom.id}|}" method ="POST" id="add-member-form">
+                    <input type="text" name="username" placeholder="username" id="add-member-field"/>
+                    <input type="submit" value="add to chatroom"/>
                 </form>
+
+                <div class="dropdown" id="add-friends-dropdown">
+                    <button id="friends" type="button"
+                            class="btn btn-primary dropdown-toggle"
+                            data-toggle="dropdown">add friend
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li role="presentation" th:each="friend : ${absentFriends}">
+                            <p role="menuitem" th:text="${friend.username}"
+                               th:onclick="'fillAddMemberForm(\'' + ${friend.username} + '\');'">
+                            </p>
+                        </li>
+                    </ul>
+                </div>
 
                 <h4>Leave this chatroom</h4>
                 <form th:action="@{|/chatrooms/leave/${chatroom.id}|}" method ="POST">

@@ -78,7 +78,8 @@ public class ChatroomControllerTest {
     public void viewingChatroomSuccessfullyAddsChatroomData() throws Exception {
         mockMvc.perform(get("/chatrooms/" + chatroom.getId()))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(model().attribute("chatroom", chatroom));
+                .andExpect(model().attribute("chatroom", chatroom))
+                .andExpect(model().attributeExists("absentFriends"));
     }
 
     @Test

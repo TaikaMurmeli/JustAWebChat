@@ -15,6 +15,7 @@ import wad.domain.Chatroom;
 import wad.domain.User;
 import wad.repository.ChatroomRepository;
 import wad.repository.UserRepository;
+import wad.service.ChatroomService;
 import wad.service.UserService;
 
 @Controller
@@ -22,9 +23,12 @@ import wad.service.UserService;
 public class ChatroomController {
     
     @Autowired
-    private ChatroomRepository chatroomRepository;
-    @Autowired
     private UserService userService;
+    @Autowired
+    private ChatroomService chatroomService;
+    
+    @Autowired
+    private ChatroomRepository chatroomRepository;
     @Autowired
     UserRepository userRepository;
     
@@ -39,6 +43,8 @@ public class ChatroomController {
         
         if (chatroom.getUsers().contains(user)) {
             model.addAttribute("chatroom", chatroom);
+            model.addAttribute("absentFriends",
+                    chatroomService.getFriendsNotInChatroom(user, chatroom));
         } else {
             model.addAttribute("unauthorizedAccess", "Were sorry, but you "
                     + "do not belong here.");

@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 @Entity
-public class User extends AbstractPersistable<Long> {
+public class User extends AbstractPersistable<Long> implements Comparable<User>{
 
     @Valid
     //The unicode characters are Ä,ä,Ö,ö
@@ -129,6 +129,11 @@ public class User extends AbstractPersistable<Long> {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public int compareTo(User otherUser) {
+        return otherUser.username.compareTo(name);
     }
 
 }
