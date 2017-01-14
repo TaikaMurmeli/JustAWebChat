@@ -190,7 +190,7 @@ public class UserControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"))
                 .andExpect(flash().attribute("friendingMessage",
-                        "Given username doesn not exist."));
+                        "Given username does not exist."));
 
         assertTrue(bob.getFriends().isEmpty());
     }

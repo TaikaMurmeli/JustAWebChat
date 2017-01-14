@@ -70,7 +70,7 @@ public class UserController {
 
         if (friend == null) {
             redirectAttributes.addFlashAttribute("friendingMessage", 
-                    "Given username doesn not exist.");
+                    "Given username does not exist.");
         } else if (friend.equals(self)) {
             redirectAttributes.addFlashAttribute("friendingMessage", 
                     "You cannot add yourself as friend. Makes no sense...");
